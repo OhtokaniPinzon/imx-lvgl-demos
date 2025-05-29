@@ -1,0 +1,67 @@
+From 18f4564e97a14d7014d907e88bf51af1ccc66831 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ohtokani=20Pinz=C3=B3n?=
+ <nxf81389@lsvm07u0000029.swis.us-west-2.aws.nxp.com>
+Date: Thu, 22 May 2025 17:32:59 -0700
+Subject: [PATCH] Added custom tick get function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Ohtokani Pinzón <nxf81389@lsvm07u0000029.swis.us-west-2.aws.nxp.com>
+---
+ src/hal/lv_hal_tick.c | 18 ++++++++++++++++++
+ src/hal/lv_hal_tick.h |  2 ++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/src/hal/lv_hal_tick.c b/src/hal/lv_hal_tick.c
+index 6c8434622..0422296d1 100644
+--- a/src/hal/lv_hal_tick.c
++++ b/src/hal/lv_hal_tick.c
+@@ -11,6 +11,24 @@
+ 
+ #if LV_TICK_CUSTOM == 1
+     #include LV_TICK_CUSTOM_INCLUDE
++
++    uint32_t custom_tick_get(void)
++    {
++        static uint64_t start_ms = 0;
++        if(start_ms == 0) {
++            struct timeval tv_start;
++            gettimeofday(&tv_start, NULL);
++            start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
++        }
++
++        struct timeval tv_now;
++        gettimeofday(&tv_now, NULL);
++        uint64_t now_ms;
++        now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
++
++        uint32_t time_ms = now_ms - start_ms;
++        return time_ms;
++    }
+ #endif
+ 
+ /*********************
+diff --git a/src/hal/lv_hal_tick.h b/src/hal/lv_hal_tick.h
+index d493ad351..e0af09bd2 100644
+--- a/src/hal/lv_hal_tick.h
++++ b/src/hal/lv_hal_tick.h
+@@ -17,6 +17,7 @@ extern "C" {
+ 
+ #include <stdint.h>
+ #include <stdbool.h>
++#include <sys/time.h>
+ 
+ /*********************
+  *      DEFINES
+@@ -50,6 +51,7 @@ void /* LV_ATTRIBUTE_TICK_INC */ lv_tick_inc(uint32_t tick_period);
+  * @return the elapsed milliseconds
+  */
+ uint32_t lv_tick_get(void);
++uint32_t custom_tick_get(void);
+ 
+ /**
+  * Get the elapsed milliseconds since a previous time stamp
+-- 
+2.34.1
+
