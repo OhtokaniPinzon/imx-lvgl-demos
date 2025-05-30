@@ -16,7 +16,7 @@ LDFLAGS = -lm -lwayland-client -lxkbcommon -lwayland-cursor -lrt -Llv_drivers/wa
 BIN_DIR = ./bin
 OBJ_DIR = ./obj
 
-BIN = lvgl-demo
+BIN = lvgl8-examples
 
 #Collect the files to compile
 #MAINSRC = ./main.c
